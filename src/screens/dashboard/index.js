@@ -1,20 +1,20 @@
 /* eslint-disable */
 import React, {useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
-import TextBox from '../../components/TextBox';
-import {Picker} from '@react-native-picker/picker';
+import {View} from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import {getSubjects} from './network';
-import moment from 'moment';
+import TeacherDashboard from './TeacherDashboard';
+import StudentDashboard from './StudentDashboard';
 
 const Dashboard = ({navigation}) => {
   const [user, setUser] = useState(null);
   const [userDetails, setUserDetails] = useState(null);
   const [subjects, setSubjects] = useState([]);
+
   useEffect(() => {
     apiCall();
   }, []);
+
   useEffect(() => {}, [subjects]);
 
   const apiCall = async () => {
@@ -47,91 +47,3 @@ const Dashboard = ({navigation}) => {
 };
 
 export default Dashboard;
-
-const TeacherDashboard = ({navigation, subjectData, userDetails}) => {
-  const [selectedSubCode, setSelectedSubCode] = useState(null);
-  const [date, setDate] = useState(null);
-  const [calendarVisible, setCalendarVisible] = useState(false);
-
-  const onTeacherPress = () => {
-    console.log('Pressed');
-  };
-  const showDatePicker = () => {
-    setCalendarVisible(true);
-  };
-  const hideDatePicker = () => {
-    setCalendarVisible(false);
-  };
-  const handleConfirm = (date) => {
-    setDate(date);
-    hideDatePicker();
-  };
-
-  return (
-    <>
-      <View>
-        <Text style={{textAlign: 'center'}}> Teacher Dashboard</Text>
-        <View style={{borderWidth: 0.5, borderColor: 'black'}}>
-          <Picker
-            selectedValue={selectedSubCode}
-            style={{
-              height: 40,
-              width: '100%',
-              color: selectedSubCode === null ? '#808080' : '#282828',
-            }}
-            mode={'dropdown'}
-            onValueChange={(itemValue) => setSelectedSubCode(itemValue)}>
-            <Picker.Item label="Select Subject" value={null} />
-            {subjectData.map((item) => {
-              const label = `${item.subjectName} ( ${item.subjectCode} )`;
-              const val = item.subjectCode;
-              return <Picker.Item label={label} value={val} key={item._id} />;
-            })}
-          </Picker>
-        </View>
-        <TouchableOpacity onPress={showDatePicker}>
-          <TextBox
-            value={date ? moment(date).format('DD-MMM-YYYY') : 'Select Date'}
-            editable={false}
-            style={{color: 'black', borderWidth: 0.5}}
-          />
-        </TouchableOpacity>
-        <TextBox
-          value={userDetails.fullname}
-          editable={false}
-          style={{color: 'black', borderWidth: 0.5}}
-        />
-        <TextBox
-          value={userDetails.serviceId}
-          editable={false}
-          style={{color: 'black', borderWidth: 0.5}}
-        />
-        <DateTimePickerModal
-          isVisible={calendarVisible}
-          mode="date"
-          onConfirm={handleConfirm}
-          onCancel={hideDatePicker}
-        />
-        <TouchableOpacity onPress={onTeacherPress}>
-          <Text style={{textAlign: 'center'}}>Generate QR</Text>
-        </TouchableOpacity>
-      </View>
-    </>
-  );
-};
-
-const StudentDashboard = ({navigation, userDetails}) => {
-  const onStudentPress = () => {
-    console.log('Pressed');
-  };
-  return (
-    <>
-      <View>
-        <Text style={{textAlign: 'center'}}> Student Dashboard !</Text>
-        <TouchableOpacity onPress={onStudentPress}>
-          <Text style={{textAlign: 'center'}}>Generate QR</Text>
-        </TouchableOpacity>
-      </View>
-    </>
-  );
-};
