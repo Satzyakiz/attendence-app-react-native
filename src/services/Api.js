@@ -9,4 +9,5 @@ export default {
   update: url + '/update',
   attendence: url + '/attendence',
   subject: url + '/subject',
+  createAttendenceSheet: url + '/attendence/createAttendenceSheet',
 };

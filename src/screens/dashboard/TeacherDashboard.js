@@ -17,7 +17,7 @@ const TeacherDashboard = ({navigation, subjectData, userDetails}) => {
   useEffect(() => {}, [showQr]);
 
   const onTeacherPress = () => {
-    console.log('Pressed');
+    // console.log('Pressed');
     if (!date || !selectedSub) return;
     let val = JSON.parse(selectedSub);
     val = {
@@ -26,7 +26,7 @@ const TeacherDashboard = ({navigation, subjectData, userDetails}) => {
       teacherName: userDetails.fullname,
     };
     val = JSON.stringify(val);
-    console.log(val);
+    // console.log(val);
     setQRValue(val);
     setShowQr(true);
   };

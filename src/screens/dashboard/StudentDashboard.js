@@ -35,7 +35,7 @@ const StudentDashboard = ({navigation, userDetails}) => {
             onRequestClose={() => {
               setScanQr(false);
             }}>
-            <QRScanner hide={() => setScanQr(false)} />
+            <QRScanner user={userDetails} hide={() => setScanQr(false)} />
           </Modal>
         </View>
       </View>
