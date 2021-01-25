@@ -1,9 +1,11 @@
 /* eslint-disable */
 import React, {useState, useEffect} from 'react';
-import {View, Text, TouchableOpacity} from 'react-native';
+import {View, Text, TouchableOpacity, ScrollView} from 'react-native';
 import {Picker} from '@react-native-picker/picker';
 import TextBox from '../../components/TextBox';
 import {signup} from './network';
+import Styles from './style';
+import Toast from '../../components/Toast';
 
 const Signup = ({navigation}) => {
   const [signupAs, setSignupAs] = useState(null);
@@ -16,8 +18,12 @@ const Signup = ({navigation}) => {
   const [year, setYear] = useState(null);
   const [roll, setRoll] = useState(null);
   const [serviceId, setServiceId] = useState(null);
+  const [loader, setLoader] = useState(false);
+  const [securePassword, setSecurePassword] = useState(true);
+  const [secureConfirmPassword, setSecureConfirmPassword] = useState(true);
 
-  useEffect(() => {}, [signupAs]);
+  useEffect(() => {}, [signupAs, loader]);
+
   const setNameChange = (text) => {
     text.length ? setName(text) : setName(null);
   };
@@ -42,12 +48,20 @@ const Signup = ({navigation}) => {
   };
 
   const onPressSignupProceed = async () => {
-    if (!signupAs || !name || !username || !password || !confirmPassword)
+    if (!signupAs || !name || !username || !password || !confirmPassword) {
+      Toast('Please fill all the details', 0, -100);
       return;
-    if (password !== confirmPassword) return;
+    }
+    if (password !== confirmPassword) {
+      Toast('Passwords do not match', 0, -100);
+      return;
+    }
     let data = {};
     if (signupAs === 'student') {
-      if (!dept || !year || !roll) return;
+      if (!dept || !year || !roll) {
+        Toast('Please select all the details', 0, -100);
+        return;
+      }
       data = {
         fullname: name,
         username: username,
@@ -59,7 +73,10 @@ const Signup = ({navigation}) => {
         signupAs: signupAs,
       };
     } else {
-      if (!serviceId) return;
+      if (!serviceId) {
+        Toast('Please fill all the details', 0, -100);
+        return;
+      }
       data = {
         fullname: name,
         username: username,
@@ -68,43 +85,76 @@ const Signup = ({navigation}) => {
         signupAs: signupAs,
       };
     }
+    setLoader(true);
     const signup_ = await signup(data);
     console.log('Signup response is ', signup_);
     if (signup_.success) {
-      navigation.navigate('Dashboard');
+      Toast('Successfully signed up', 1, -100);
+      navigation.navigate('Login');
+    } else {
+      Toast('Signup not successfull', 0, -100);
     }
+    setLoader(false);
   };
-
+  if (loader)
+    return (
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          alignSelf: 'center',
+        }}>
+        {/* <Bubbles size={10} color="#FFF" /> */}
+        <Bars size={20} color="#0078ff" />
+        {/* <Pulse size={10} color="#52AB42" /> */}
+        {/* <DoubleBounce size={10} color="#1CAFF6" /> */}
+      </View>
+    );
   return (
-    <View style={{flex: 1, justifyContent: 'center'}}>
-      <Text style={{textAlign: 'center'}}>Signup</Text>
+    <ScrollView>
+      <View style={{marginTop: 50}}></View>
+      <Text style={Styles.headingText}>Signup</Text>
       <TextBox
         placeholder={'Enter Full Name'}
         value={name}
         onChangeFunc={setNameChange}
+        label="Fullname"
       />
       <TextBox
         placeholder={'Enter Username'}
         value={username}
         onChangeFunc={setUsernameChange}
+        label="Username"
       />
       <TextBox
         placeholder={'Password'}
         value={password}
         onChangeFunc={setPasswordChange}
-        secureText={true}
+        secureText={securePassword}
+        isPassword={true}
+        passwordToggle={() => {
+          setSecurePassword(!securePassword);
+        }}
+        label="Password"
       />
       <TextBox
         placeholder={'Confirm Password'}
         value={confirmPassword}
         onChangeFunc={setConfirmPasswordChange}
-        secureText={true}
+        secureText={secureConfirmPassword}
+        isPassword={true}
+        passwordToggle={() => {
+          setSecureConfirmPassword(!secureConfirmPassword);
+        }}
+        label="Confirm Password"
       />
-      <View style={{borderWidth: 0.5, borderColor: 'black'}}>
+      <Text style={Styles.labelStyle}>Signup As</Text>
+      <View style={Styles.pickerStyle}>
         <Picker
           selectedValue={signupAs}
           style={{
-            height: 40,
+            height: 50,
             width: '100%',
             color: signupAs === null ? '#808080' : '#282828',
           }}
@@ -117,11 +167,12 @@ const Signup = ({navigation}) => {
       </View>
       {signupAs === 'student' ? (
         <>
-          <View style={{borderWidth: 0.5, borderColor: 'black'}}>
+          <Text style={Styles.labelStyle}>Department</Text>
+          <View style={Styles.pickerStyle}>
             <Picker
               selectedValue={dept}
               style={{
-                height: 40,
+                height: 50,
                 width: '100%',
                 color: dept === null ? '#808080' : '#282828',
               }}
@@ -134,11 +185,12 @@ const Signup = ({navigation}) => {
               <Picker.Item label="EE" value="EE" />
             </Picker>
           </View>
-          <View style={{borderWidth: 0.5, borderColor: 'black'}}>
+          <Text style={Styles.labelStyle}>Section</Text>
+          <View style={Styles.pickerStyle}>
             <Picker
               selectedValue={sec}
               style={{
-                height: 40,
+                height: 50,
                 width: '100%',
                 color: sec === null ? '#808080' : '#282828',
               }}
@@ -150,27 +202,29 @@ const Signup = ({navigation}) => {
               <Picker.Item label="B" value="B" />
             </Picker>
           </View>
-          <View style={{borderWidth: 0.5, borderColor: 'black'}}>
+          <Text style={Styles.labelStyle}>Year</Text>
+          <View style={Styles.pickerStyle}>
             <Picker
               selectedValue={year}
               style={{
-                height: 40,
+                height: 50,
                 width: '100%',
                 color: year === null ? '#808080' : '#282828',
               }}
               mode={'dropdown'}
               onValueChange={(itemValue) => setYear(itemValue)}>
               <Picker.Item label="Select Year" value={null} />
-              <Picker.Item label="1st" value="1st" />
-              <Picker.Item label="2nd" value="2nd" />
-              <Picker.Item label="3rd" value="3rd" />
-              <Picker.Item label="4th" value="4th" />
+              <Picker.Item label="1st" value="1" />
+              <Picker.Item label="2nd" value="2" />
+              <Picker.Item label="3rd" value="3" />
+              <Picker.Item label="4th" value="4" />
             </Picker>
           </View>
           <TextBox
             placeholder={'Roll No'}
             value={roll}
             onChangeFunc={setRollChange}
+            label="Roll No"
           />
         </>
       ) : null}
@@ -180,27 +234,19 @@ const Signup = ({navigation}) => {
             placeholder={'Id no'}
             value={serviceId}
             onChangeFunc={setServiceIdChange}
+            label="Service Id"
           />
         </>
       ) : null}
-      <TouchableOpacity onPress={onPressSignupProceed}>
-        <View
-          style={{
-            margin: 10,
-            padding: 5,
-            backgroundColor: 'blue',
-            width: '50%',
-            alignSelf: 'center',
-          }}>
-          <Text style={{textAlign: 'center', color: 'white'}}>Proceed</Text>
-        </View>
+      <TouchableOpacity
+        onPress={onPressSignupProceed}
+        style={Styles.proceedBtnStyle}>
+        <Text style={Styles.proceedBtnTxtStyle}>Proceed</Text>
       </TouchableOpacity>
-      <TouchableOpacity onPress={onPressLogin}>
-        <View>
-          <Text style={{textAlign: 'center'}}>Already Registered ? Login</Text>
-        </View>
+      <TouchableOpacity onPress={onPressLogin} style={{marginBottom: 50}}>
+        <Text style={Styles.alternateTxt}>Already Registered ? Login</Text>
       </TouchableOpacity>
-    </View>
+    </ScrollView>
   );
 };
 

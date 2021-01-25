@@ -10,15 +10,18 @@ import {
 } from 'react-native';
 import 'react-native-gesture-handler';
 import {NavigationContainer} from '@react-navigation/native';
+import {RootSiblingParent} from 'react-native-root-siblings';
 
 import ApplicationNavigator from './src/Navigator';
 
 const App = () => {
   return (
-    <NavigationContainer>
-      <StatusBar barStyle="light-content" />
-      <ApplicationNavigator />
-    </NavigationContainer>
+    <RootSiblingParent>
+      <NavigationContainer>
+        <StatusBar barStyle="light-content" />
+        <ApplicationNavigator />
+      </NavigationContainer>
+    </RootSiblingParent>
   );
 };
 

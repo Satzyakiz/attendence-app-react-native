@@ -2,24 +2,32 @@
 
 import React, {useEffect, useState} from 'react';
 import {View, Text, TouchableOpacity, Modal} from 'react-native';
-// import TextBox from '../../components/TextBox';
-// import {Picker} from '@react-native-picker/picker';
-// import DateTimePickerModal from 'react-native-modal-datetime-picker';
-// import moment from 'moment';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {QRScanner} from '../qr';
+import Styles from './style';
 
-const StudentDashboard = ({navigation, userDetails}) => {
-  console.log(userDetails);
+const StudentDashboard = ({navigation}) => {
   const [scanQr, setScanQr] = useState(false);
+  const [userDetails, setUserDetails] = useState(null);
+  useEffect(() => {
+    apiCall();
+  }, []);
+  const apiCall = async () => {
+    let res = await AsyncStorage.getItem('User');
+    res = JSON.parse(res);
+    console.log('Student details: ', res);
+    setUserDetails(res);
+  };
   const onStudentPress = () => {
     setScanQr(true);
   };
   return (
     <>
       <View>
-        <Text style={{textAlign: 'center'}}> Student Dashboard !</Text>
-        <TouchableOpacity onPress={onStudentPress}>
-          <Text style={{textAlign: 'center'}}>Mark Attendence</Text>
+        <TouchableOpacity
+          onPress={onStudentPress}
+          style={Styles.mainButtonStyle}>
+          <Text style={Styles.mainButtonTextStyle}>Mark Attendence</Text>
         </TouchableOpacity>
         <View
           style={{

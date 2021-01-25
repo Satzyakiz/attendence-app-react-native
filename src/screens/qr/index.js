@@ -6,22 +6,19 @@ import QRCode from 'react-native-qrcode-svg';
 import QRCodeScanner from 'react-native-qrcode-scanner';
 import ErrorPage from '../error';
 import {createAttendenceSheet, markAttendence} from './network';
+import Toast from '../../components/Toast';
 
 export const QRGenerator = ({value, hide}) => {
   console.log('value in generator: ', value);
-  const [isError, setIsError] = useState(false);
 
   useEffect(() => {
     apiCall();
   }, []);
 
-  useEffect(() => {}, [isError]);
-
   const apiCall = async () => {
     if (!value) {
-      setIsError(true);
+      Toast('Value not found', 0, -100);
     } else {
-      setIsError(false);
       const val = JSON.parse(value);
       const data = {
         subjectCode: val.subjectCode,
@@ -31,23 +28,10 @@ export const QRGenerator = ({value, hide}) => {
       };
       const create_ = await createAttendenceSheet(data);
       if (!create_.success) {
-        setIsError(true);
+        Toast('Some error occured while creating attendence list', 0, -100);
       }
     }
   };
-
-  if (isError)
-    return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          marginTop: 22,
-        }}>
-        <ErrorPage hide={hide} />
-      </View>
-    );
 
   return (
     <View
@@ -66,14 +50,12 @@ export const QRGenerator = ({value, hide}) => {
 };
 
 export const QRScanner = ({user, hide}) => {
-  const [isError, setIsError] = useState(false);
   const [loader, setLoader] = useState(false);
 
   useEffect(() => {
     LogBox.ignoreLogs(['Animated: `useNativeDriver`']);
   }, []);
   useEffect(() => {}, [loader]);
-  useEffect(() => {}, [isError]);
 
   const onSuccess = (e) => {
     //   Linking.openURL(e.data).catch((err) =>
@@ -86,7 +68,7 @@ export const QRScanner = ({user, hide}) => {
 
   const apiCall = async (data) => {
     if (!data || !user) {
-      setIsError(true);
+      Toast('Some error occured', 0, -100);
     } else {
       let val = JSON.parse(data);
       let data_ = {
@@ -106,15 +88,14 @@ export const QRScanner = ({user, hide}) => {
       const mark_ = await markAttendence(data_);
       if (mark_.success) {
         setLoader(false);
+        Toast('Attendence marked successfully', 1, -100, '-long');
         hide();
       } else {
+        Toast('Attendence was not marked successfully', 0, -100, '-long');
         setLoader(false);
-        setIsError(true);
       }
     }
   };
-
-  if (isError) return <ErrorPage hide={hide} />;
 
   if (loader)
     return (
@@ -126,7 +107,7 @@ export const QRScanner = ({user, hide}) => {
           alignSelf: 'center',
         }}>
         {/* <Bubbles size={10} color="#FFF" /> */}
-        <Bars size={20} color="#FDAAFF" />
+        <Bars size={20} color="#0078ff" />
         {/* <Pulse size={10} color="#52AB42" /> */}
         {/* <DoubleBounce size={10} color="#1CAFF6" /> */}
       </View>
@@ -139,12 +120,31 @@ export const QRScanner = ({user, hide}) => {
         // flashMode={RNCamera.Constants.FlashMode.torch}
         topContent={
           <>
-            <Text> Hold Steady ! Scanning</Text>
+            <Text style={{fontSize: 20, fontWeight: '600'}}>
+              {' '}
+              Hold Steady ! Scanning
+            </Text>
           </>
         }
         bottomContent={
-          <TouchableOpacity onPress={hide}>
-            <Text> Exit </Text>
+          <TouchableOpacity
+            onPress={hide}
+            style={{
+              marginTop: 15,
+              backgroundColor: '#0078ff',
+              padding: 10,
+              width: '60%',
+            }}>
+            <Text
+              style={{
+                fontSize: 20,
+                fontWeight: 'bold',
+                color: 'white',
+                textAlign: 'center',
+              }}>
+              {' '}
+              Exit{' '}
+            </Text>
           </TouchableOpacity>
         }
       />

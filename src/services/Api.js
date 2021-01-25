@@ -9,5 +9,8 @@ export default {
   update: url + '/update',
   attendence: url + '/attendence',
   subject: url + '/subject',
+  teacher: url + '/teacher',
   createAttendenceSheet: url + '/attendence/createAttendenceSheet',
+  getAttendenceList: url + '/attendence/getAttendenceList',
+  deviceDetail: url + '/deviceDetail',
 };

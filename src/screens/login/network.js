@@ -42,3 +42,35 @@ export const login = async (d) => {
     };
   }
 };
+export const checkDevice = async (d) => {
+  let myHeaders = {
+    'Content-Type': 'application/json',
+  };
+
+  let data = JSON.stringify({
+    username: d.username,
+    uniqueId: d.uniqueId,
+  });
+
+  let requestOptions = {
+    method: 'POST',
+    headers: myHeaders,
+    body: data,
+  };
+
+  try {
+    let response = await fetch(`${Api.deviceDetail}`, requestOptions);
+    let status = response.status;
+    let json = await response.json();
+
+    return {
+      success: status === 200 ? 1 : 0,
+      data: json,
+    };
+  } catch (data) {
+    return {
+      success: 0,
+      data,
+    };
+  }
+};
